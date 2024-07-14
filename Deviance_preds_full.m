@@ -9,18 +9,6 @@
 % then run traditional and kernel ridge CPM on the deviant network and on
 % the whole brain (as well as a random network for comparison). 
 
-
-% To modify:
-% 2. Add a vector indicating which direction to use
-% 5. Compute variance of deviance networks
-% 6. Save after each symptom prediction is complete
-
-% To save:
-% 1. predictions for each symptom -- krCPM, CPM, 1000 deviance, 2000 deviance
-% 2. lambda, kernel type, deviance network masks
-% 3. Variance of deviance networks
-
-
 clear;
 
 %% load stuff
@@ -136,14 +124,17 @@ for t = 1:length(devpredictions)
         % get the strongest predictions from krCPM on the deviance network
         [a,b,c] = fIDkernelParams(devnetpreds,types,lambdas);
         Deviance_network.Deviance_preds_krCPM(:,te) = a;
-        Deviance_network.Dev_krCPM_type(te) = b;
+        Deviance_network.Dev_krCPM_type{te} = b;
         Deviance_network.Dev_krCPM_lambda(te) = c;
 
         clear devnetpreds a b c
        
         % get the strongest predictions from krCPM on the whole brain
-        [Deviance_network.Wholebrain_preds_krCPM(:,te),Deviance_network.Wholebrain_krCPM_type(te),...
-            Wholebrain_network.Dev_krCPM_lambda(te)] = fIDkernelParams(krCPM,types,lambdas);
+        [a,b,c] = fIDkernelParams(krCPM,types,lambdas);
+        Deviance_network.Wholebrain_preds_krCPM(:,te) = a;
+        Deviance_network.Wholebrain_krCPM_type{te} = b;
+        Deviance_network.Wholebrain_krCPM_lambda(te) = c;
+
         clear krCPM a b c
 
         fprintf('\n')
@@ -155,7 +146,7 @@ for t = 1:length(devpredictions)
     clear feat_of_interest n_high_symp_subs CPM_r
 
     % save the predictions
-    outfile = sprintf('/Users/ajsimon/Documents/Data/Constable_lab/Deviance_networks/Deviance_transdiagnostic/Full_prediction_results/%s_highSympValues.mat',...
+    outfile = sprintf('/Users/ajsimon/Documents/Data/Constable_lab/Deviance_networks/Deviance_transdiagnostic/Full_prediction_results/%s_highSymp_devnet.mat',...
         header{1,devpredictions(t)});
     save(outfile,'Deviance_network');
     clear Deviance_network outfile
